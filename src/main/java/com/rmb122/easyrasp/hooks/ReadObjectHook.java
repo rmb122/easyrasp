@@ -20,7 +20,6 @@ public class ReadObjectHook {
 
     @HookHandler(hookClass = "java.io.ObjectInputStream", hookMethod = "readClassDesc", hookType = HookType.AFTER_RUN)
     public static ObjectStreamClass readObjectCheck(ObjectStreamClass ret) throws Exception {
-
         if (ret != null) {
             if (blackList.contains(ret.getName())) {
                 throw new SecurityException(String.format("Class %s deserialize not allow", ret.getName()));
