@@ -1,6 +1,7 @@
 package com.rmb122.easyrasp;
 
 import com.rmb122.easyrasp.annotation.HookHandler;
+import com.rmb122.easyrasp.annotation.HookHandlers;
 import javassist.*;
 import org.reflections.Reflections;
 import org.reflections.scanners.MethodAnnotationsScanner;
@@ -29,19 +30,29 @@ public class Transformer implements ClassFileTransformer {
         HashMap<String, List<HookDesc>> handlers = new HashMap<>();
         Reflections reflections = new Reflections("com.rmb122.easyrasp", new MethodAnnotationsScanner());
         Set<Method> methodsWithAnnotation = reflections.getMethodsAnnotatedWith(HookHandler.class);
+        methodsWithAnnotation.addAll( reflections.getMethodsAnnotatedWith(HookHandlers.class));
 
         for (Method method : methodsWithAnnotation) {
             if (Modifier.isStatic(method.getModifiers())) {
-                HookHandler hookHandler = method.getAnnotation(HookHandler.class);
-                HookDesc hookDesc = HookDesc.fromHookHandler(hookHandler, method);
-                logger.info("Arm hook with " + hookDesc.handlerMethod.getName() + " in " + hookDesc.hookClassName + "." + hookDesc.hookMethodName);
-
-                List<HookDesc> hookDescs = handlers.get(hookDesc.hookClassName);
-                if (hookDescs == null) {
-                    hookDescs = new ArrayList<>();
-                    handlers.put(hookDesc.hookClassName, hookDescs);
+                HookHandler[] hookHandlers;
+                HookHandler tmp = method.getAnnotation(HookHandler.class);
+                if (tmp != null) {
+                    hookHandlers = new HookHandler[]{tmp};
+                } else {
+                    hookHandlers = method.getAnnotation(HookHandlers.class).value();
                 }
-                hookDescs.add(hookDesc);
+
+                for (HookHandler hookHandler : hookHandlers) {
+                    HookDesc hookDesc = HookDesc.fromHookHandler(hookHandler, method);
+                    logger.info("Arm hook with " + hookDesc.handlerMethod.getName() + " in " + hookDesc.hookClassName + "." + hookDesc.hookMethodName);
+
+                    List<HookDesc> hookDescs = handlers.get(hookDesc.hookClassName);
+                    if (hookDescs == null) {
+                        hookDescs = new ArrayList<>();
+                        handlers.put(hookDesc.hookClassName, hookDescs);
+                    }
+                    hookDescs.add(hookDesc);
+                }
             } else {
                 logger.info("Can't use " + method + " as it's not a static method");
             }
@@ -105,7 +116,12 @@ public class Transformer implements ClassFileTransformer {
                                 funcBody = "$_=" + funcBody + "($_);"; // 替换返回值
                                 ctBehavior.insertAfter(funcBody);
                                 break;
+                            case AFTER_RUN_FINALLY:
+                                funcBody = funcBody + "($_);";
+                                ctBehavior.insertAfter(funcBody, true);
+                                break;
                         }
+                        logger.info("Install hook success.");
                     }
                 }
                 return ctClass.toBytecode();

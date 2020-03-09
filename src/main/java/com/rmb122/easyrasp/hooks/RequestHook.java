@@ -1,6 +1,7 @@
 package com.rmb122.easyrasp.hooks;
 
 import com.rmb122.easyrasp.annotation.HookHandler;
+import com.rmb122.easyrasp.enums.HookType;
 
 public class RequestHook {
     private static ThreadLocal<Object> currRequest = new ThreadLocal<>();
@@ -11,11 +12,12 @@ public class RequestHook {
         return params;
     }
 
-    public static Object getRequest() {
-        return currRequest.get();
+    @HookHandler(hookClass = "org.springframework.web.servlet.FrameworkServlet", hookMethod = "service", hookType = HookType.AFTER_RUN_FINALLY)
+    public static void releaseRequest(Object ignored) {
+        currRequest.remove(); // 释放内存
     }
 
-    public static void releaseRequest() {
-        currRequest.remove();
+    public static Object getRequest() {
+        return currRequest.get();
     }
 }
