@@ -15,7 +15,7 @@ public class LDAPInjectHook {
         if (className.equals("org.apache.naming.factory.BeanFactory")) {
             throw new SecurityException("Can't set factory class to org.apache.naming.factory.BeanFactory");
         }
-        if (factoryClassLocation != null && factoryClassLocation.startsWith("http")) {
+        if (factoryClassLocation != null) {
             throw new SecurityException("Can't set factory class location to remote addr");
         }
         return params;
