@@ -108,7 +108,7 @@ public class Transformer implements ClassFileTransformer {
                                 if (!javassist.Modifier.isStatic(ctBehavior.getModifiers())) {
                                     funcBody = "{$args=" + funcBody + "($0,$args);}";
                                 } else {
-                                    funcBody = "{$args="+funcBody + "($args);}";
+                                    funcBody = "{$args=" + funcBody + "($args);}";
                                 }
                                 ctBehavior.insertBefore(funcBody); // 替换参数
                                 break;

@@ -10,3 +10,22 @@ Hook `java.io.ObjectInputStream.readClassDesc` 的返回值, 阻止恶意类反�
 * Hook 大部分的方法
 * 检查, 替换方法的参数
 * 检查, 替换方法的返回值
+
+## 使用方法
+
+hook 声明基于注解, 示例:  
+```java
+@HookHandler(hookClass = "org.springframework.web.servlet.FrameworkServlet", hookMethod = "service")
+public static Object[] requestHook(Object self, Object[] params) {
+    currRequest.set(params[0]);
+    return params;
+}
+```
+
+默认的 hook 类型是在真正的代码运行前. 如果 hook 的目标方法是非 `static` 传入的参数为 `Object self, Object[] params`,  
+如果是 `static` 则为 `Object[] params`, params 为函数的实参, self 为被调用方法所属的对象. 其中返回值会被用于替换原来的参数.
+  
+还有两种为在代码运行后, 传入的参数为 `Object ret`, 为函数的返回值, 对于 AFTER_RUN, 返回值会被用于替换原返回值.  
+而对 AFTER_RUN_FINALLY, 即使 hook 的方法运行中抛出异常, 也会被运行, 因此无法替换原返回值.  
+
+更多示例可以看 hooks 文件夹下的代码.  
