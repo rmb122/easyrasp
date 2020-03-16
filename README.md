@@ -13,6 +13,7 @@
 2. Hook `java.lang.ProcessImpl.<init>` 得到实际执行的命令, 只是一个 demo, 仅能防御 Runtime.exec() 直接跑一个参数的情况 (逃  
 3. Hook `java.io.ObjectInputStream.readClassDesc` 的返回值, 阻止恶意类反序列化.  
 4. Hook `javax.naming.spi.NamingManager.getObjectFactoryFromReference` 阻止 LDAP 注入.  
+5. Hook `sun.rmi.server.LoaderHandler.lookupLoader` 阻止远程设置恶意 codebase.  
 
 ## 怎样 Hook?
 
