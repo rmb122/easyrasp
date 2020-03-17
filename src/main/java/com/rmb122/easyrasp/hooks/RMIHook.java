@@ -11,7 +11,7 @@ public class RMIHook {
     public static Object[] rmiHook(Object[] params) throws SecurityException {
         URL[] urls = (URL[]) params[0];
         if (urls.length != 0) {
-            throw new SecurityException(String.format("codebase %s not allowed.", Arrays.toString(urls)));
+            throw new SecurityException(String.format("Codebase %s not allowed.", Arrays.toString(urls)));
         }
         return params;
     }
