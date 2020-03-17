@@ -14,6 +14,7 @@
 3. Hook `java.io.ObjectInputStream.readClassDesc` 的返回值, 阻止恶意类反序列化.  
 4. Hook `javax.naming.spi.NamingManager.getObjectFactoryFromReference` 阻止 LDAP 注入.  
 5. Hook `sun.rmi.server.LoaderHandler.lookupLoader` 阻止远程设置恶意 codebase.  
+6. Hook `com.sun.org.apache.xerces.internal.impl.XMLEntityManager.expandSystemId` 避免 XML 外部实体注入.  
 
 ## 怎样 Hook?
 
